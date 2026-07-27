@@ -1,0 +1,31 @@
+import {
+  Home,
+  Brain,
+  BookOpen,
+  Code2,
+  TrendingUp,
+  Compass,
+  Bot,
+  ClipboardCheck,
+  Trophy,
+  Briefcase,
+  FileText,
+  MessageCircle,
+  Settings,
+} from 'lucide-react';
+
+export const studentMenu = [
+  { label: 'Dashboard', to: '/student/dashboard', icon: Home },
+  { label: 'SkillDNA', to: '/student/skilldna', icon: Brain },
+  { label: 'Learning', to: '/student/learning', icon: BookOpen },
+  { label: 'Coding Practice', to: '/student/practice', icon: Code2 },
+  { label: 'Progress', to: '/student/progress', icon: TrendingUp },
+  { label: 'Career Roadmap', to: '/student/career-roadmap', icon: Compass },
+  { label: 'AI Mentor', to: '/student/ai-mentor', icon: Bot },
+  { label: 'Assessments', to: '/student/assessments', icon: ClipboardCheck },
+  { label: 'Achievements', to: '/student/achievements', icon: Trophy },
+  { label: 'Jobs', to: '/student/jobs', icon: Briefcase },
+  { label: 'Applications', to: '/student/applications', icon: FileText },
+  { label: 'Messages', to: '/student/messages', icon: MessageCircle },
+  { label: 'Settings', to: '/student/settings', icon: Settings },
+];

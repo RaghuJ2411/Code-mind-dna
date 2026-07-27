@@ -1,0 +1,30 @@
+import {
+  Home,
+  Users,
+  TriangleAlert,
+  Brain,
+  ClipboardCheck,
+  Calendar,
+  MessageCircle,
+  BarChart3,
+  Sparkles,
+  BookOpen,
+  Trophy,
+  Settings,
+} from 'lucide-react';
+
+export const mentorMenu = [
+  { label: 'Dashboard', to: '/mentor/dashboard', icon: Home },
+  { label: 'Students', to: '/mentor/students', icon: Users },
+  { label: 'Risk Alerts', to: '/mentor/risk-alerts', icon: TriangleAlert },
+  { label: 'Student Intelligence', to: '/mentor/intelligence', icon: Brain },
+  { label: 'Assessments', to: '/mentor/assessments', icon: ClipboardCheck },
+  { label: 'Sessions', to: '/mentor/sessions', icon: Calendar },
+  { label: 'Messages', to: '/mentor/messages', icon: MessageCircle },
+  { label: 'Recommendations', to: '/mentor/recommendations', icon: Sparkles },
+  { label: 'Resources', to: '/mentor/resources', icon: BookOpen },
+  { label: 'Analytics', to: '/mentor/analytics', icon: BarChart3 },
+  { label: 'Student Progress', to: '/mentor/progress', icon: BarChart3 },
+  { label: 'Achievements', to: '/mentor/achievements', icon: Trophy },
+  { label: 'Settings', to: '/mentor/settings', icon: Settings },
+];
