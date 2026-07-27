@@ -5,11 +5,19 @@ on:
     branches: [ main ]
     paths:
       - 'backend/**'
-      - 'Dockerfile'
-
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
+      - name: Trigger Render deploy (backend)
+        run: |
+          echo "Triggering backend deploy"
+          curl -sS -X POST "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID_BACKEND }}/deploys" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
+            -H "Content-Type: application/json" -d '{}'
+      - name: Show backend service info
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq
+          echo "Backend service info:"
+          curl -sS "https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID_BACKEND }}" \
+            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" | jq '.'
     steps:
       - uses: actions/checkout@v4
 
