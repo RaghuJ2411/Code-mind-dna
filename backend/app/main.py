@@ -4,6 +4,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse
+
 from app.api.analytics import router as analytics_router
 from app.api.auth import router as auth_router
 from app.api.dna import router as dna_router
@@ -207,12 +209,8 @@ app.add_middleware(AuditLogMiddleware)
 
 
 @app.get("/")
-def root():
-    return {
-        "service": settings.app_name,
-        "docs": "/docs",
-        "health": "/api/health",
-    }
+def root_redirect():
+    return RedirectResponse(url="http://localhost:5173")
 
 
 @app.get("/api/health")
