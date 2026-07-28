@@ -13,8 +13,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Deploy to Render
-        uses: render-actions/render-deploy@v1
-        with:
-          api_key: ${{ secrets.RENDER_API_KEY }}
-          service_id: ${{ secrets.RENDER_SERVICE_ID_BACKEND }}
+      - name: Validate Render secrets
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID_BACKEND: ${{ secrets.RENDER_SERVICE_ID_BACKEND }}
+        run: |
+          test -n "${RENDER_API_KEY}" || (echo "::error::Missing RENDER_API_KEY secret" && exit 1)
+          test -n "${RENDER_SERVICE_ID_BACKEND}" || (echo "::error::Missing RENDER_SERVICE_ID_BACKEND secret" && exit 1)
+
+      - name: Trigger Render deploy (backend)
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID_BACKEND: ${{ secrets.RENDER_SERVICE_ID_BACKEND }}
+        run: |
+          curl -sS -f -X POST "https://api.render.com/v1/services/${RENDER_SERVICE_ID_BACKEND}/deploys" \
+            -H "Authorization: Bearer ${RENDER_API_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{}'
+
+      - name: Show backend service info
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID_BACKEND: ${{ secrets.RENDER_SERVICE_ID_BACKEND }}
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y jq
+          curl -sS -f "https://api.render.com/v1/services/${RENDER_SERVICE_ID_BACKEND}" \
+            -H "Authorization: Bearer ${RENDER_API_KEY}" | jq '.'
