@@ -6,6 +6,9 @@ on:
     paths:
       - 'backend/**'
       - 'Dockerfile'
+      - 'render.yaml'
+      - '.python-version'
+      - '.github/workflows/deploy-backend.yml'
 
 jobs:
   build-and-deploy:
