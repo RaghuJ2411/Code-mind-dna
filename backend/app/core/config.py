@@ -27,18 +27,17 @@ class Settings(BaseSettings):
         "https://code-mind-dnas.onrender.com"
     )
 
-   # Security headers
-     security_headers_enabled: bool = True
-     hsts_max_age_seconds: int = 31536000
-     content_security_policy: str = (
-    "default-src 'self'; "
-    "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
-    "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
-    "img-src 'self' data: https://fastapi.tiangolo.com; "
-    "font-src 'self' data: https://cdn.jsdelivr.net; "
-    "connect-src 'self' https://codemind-dna-api.onrender.com http://localhost:*;"
- )
-  
+    # Security headers
+    security_headers_enabled: bool = True
+    hsts_max_age_seconds: int = 31536000
+    content_security_policy: str = (
+        "default-src 'self'; "
+        "script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+        "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; "
+        "img-src 'self' data: https://fastapi.tiangolo.com; "
+        "font-src 'self' data: https://cdn.jsdelivr.net; "
+        "connect-src 'self' https://codemind-dna-api.onrender.com http://localhost:*;"
+    )
 
     # Request limits
     max_request_body_size_mb: int = 10
@@ -120,7 +119,6 @@ class Settings(BaseSettings):
                 "JWT_SECRET_KEY is set to the default insecure value"
             )
 
-        # Validate according to selected provider
         if self.ai_enabled:
             if self.ai_provider == "openai" and not self.ai_api_key:
                 warnings.append(
