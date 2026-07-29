@@ -14,3 +14,4 @@ pytest==8.4.2
 httpx==0.27.2
 email-validator==2.2.0
 python-multipart==0.0.32
+google-genai
