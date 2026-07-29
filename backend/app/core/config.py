@@ -16,7 +16,6 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60 * 24
 
     # CORS
-    # Local + Render Frontend URLs
     cors_origins: str = (
         "http://localhost:5173,"
         "http://127.0.0.1:5173,"
@@ -64,16 +63,27 @@ class Settings(BaseSettings):
     min_problems_for_progression: int = 5
     min_accepted_for_optimization: int = 2
 
-    # AI
+    # ============================
+    # AI Configuration
+    # ============================
+
     ai_enabled: bool = False
     ai_provider: str = "mock"
+
+    # OpenAI
     ai_model: str = "gpt-4"
     ai_api_key: str = ""
     ai_base_url: str = ""
+
+    # Gemini
+    gemini_api_key: str = ""
+    gemini_model: str = "gemini-2.5-flash"
+
     ai_request_timeout_seconds: int = 30
     ai_max_retries: int = 2
     ai_max_input_tokens: int | None = None
     ai_max_output_tokens: int | None = None
+
     ai_daily_limits_code_review: int = 10
     ai_daily_limits_error_explain: int = 15
     ai_daily_limits_skill_gap: int = 10
@@ -109,10 +119,17 @@ class Settings(BaseSettings):
                 "JWT_SECRET_KEY is set to the default insecure value"
             )
 
-        if self.ai_enabled and not self.ai_api_key:
-            warnings.append(
-                "AI is enabled but AI_API_KEY is not set"
-            )
+        # Validate according to selected provider
+        if self.ai_enabled:
+            if self.ai_provider == "openai" and not self.ai_api_key:
+                warnings.append(
+                    "AI_PROVIDER=openai but AI_API_KEY is not set"
+                )
+
+            if self.ai_provider == "gemini" and not self.gemini_api_key:
+                warnings.append(
+                    "AI_PROVIDER=gemini but GEMINI_API_KEY is not set"
+                )
 
         if self.database_url.startswith("sqlite"):
             warnings.append(
