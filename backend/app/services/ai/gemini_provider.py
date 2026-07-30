@@ -59,7 +59,6 @@ class GeminiProvider(LLMProvider):
         start = time.time()
 
         try:
-
             with httpx.Client(timeout=self.timeout) as client:
                 response = client.post(url, json=payload)
 
@@ -68,7 +67,8 @@ class GeminiProvider(LLMProvider):
         except httpx.ReadTimeout:
             raise AIServiceError("TIMEOUT")
 
-        except Exception:
+        except Exception as e:
+            print("HTTP ERROR:", str(e))
             raise AIServiceError("PROVIDER_UNAVAILABLE")
 
         if response.status_code == 429:
@@ -79,16 +79,35 @@ class GeminiProvider(LLMProvider):
 
         try:
             body = response.json()
-        except Exception:
+
+            print("=" * 50)
+            print("STATUS CODE:", response.status_code)
+            print("BODY:", body)
+            print("=" * 50)
+
+        except Exception as e:
+            print("JSON ERROR:", str(e))
+            raise AIServiceError("INVALID_RESPONSE")
+
+        if "error" in body:
+            print("GEMINI ERROR:", body["error"])
+            raise AIServiceError(str(body["error"]))
+
+        if "candidates" not in body:
+            print("NO CANDIDATES FOUND")
+            print(body)
             raise AIServiceError("INVALID_RESPONSE")
 
         try:
             text = body["candidates"][0]["content"]["parts"][0]["text"]
-        except Exception:
+
+        except Exception as e:
+            print("PARSING ERROR:", str(e))
             raise AIServiceError("INVALID_RESPONSE")
 
         try:
             parsed = json.loads(text)
+
         except Exception:
             parsed = {"message": text}
 
