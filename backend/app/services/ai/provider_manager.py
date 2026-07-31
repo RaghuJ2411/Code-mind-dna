@@ -13,31 +13,70 @@ class ProviderManager:
 
     def generate_structured(self, *args, **kwargs):
 
+        # ==================================================
+        # Try Gemini
+        # ==================================================
+
         try:
-            return self.gemini.generate_structured(
+            print("=" * 50)
+            print("Trying Gemini provider...")
+            print("=" * 50)
+
+            result = self.gemini.generate_structured(
                 *args,
                 **kwargs
             )
 
-        except Exception:
-            print("Gemini failed.")
+            print("Gemini succeeded.")
+            return result
+
+        except Exception as e:
+            print(f"Gemini failed: {e}")
+
+        # ==================================================
+        # Try Groq
+        # ==================================================
 
         try:
-            return self.groq.generate_structured(
+            print("=" * 50)
+            print("Trying Groq provider...")
+            print("=" * 50)
+
+            result = self.groq.generate_structured(
                 *args,
                 **kwargs
             )
 
-        except Exception:
-            print("Groq failed.")
+            print("Groq succeeded.")
+            return result
+
+        except Exception as e:
+            print(f"Groq failed: {e}")
+
+        # ==================================================
+        # Try OpenRouter
+        # ==================================================
 
         try:
-            return self.openrouter.generate_structured(
+            print("=" * 50)
+            print("Trying OpenRouter provider...")
+            print("=" * 50)
+
+            result = self.openrouter.generate_structured(
                 *args,
                 **kwargs
             )
 
-        except Exception:
-            print("OpenRouter failed.")
+            print("OpenRouter succeeded.")
+            return result
 
-        raise AIServiceError("All providers failed.")
+        except Exception as e:
+            print(f"OpenRouter failed: {e}")
+
+        # ==================================================
+        # All providers failed
+        # ==================================================
+
+        raise AIServiceError(
+            "All AI providers failed."
+        )
