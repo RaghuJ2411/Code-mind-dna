@@ -26,6 +26,8 @@ class ProviderManager:
 
         try:
             self.openrouter = OpenRouterProvider()
+            print("OpenRouter initialized successfully.")
+        except Exception as e:
             print(f"OpenRouter initialization failed: {e}")
 
     def generate_structured(self, *args, **kwargs):
@@ -60,4 +62,4 @@ class ProviderManager:
             except Exception as e:
                 print(f"OpenRouter failed: {e}")
 
-        raise AIServiceError("All providers failed.")
+        raise AIServiceError("All AI providers failed.")
