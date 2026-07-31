@@ -1,15 +1,11 @@
 from app.core.config import settings
 from .client import MockProvider
+from .provider_manager import ProviderManager
 
 try:
     from .openai_provider import OpenAIProvider
 except Exception:
     OpenAIProvider = None
-
-try:
-    from .gemini_provider import GeminiProvider
-except Exception:
-    GeminiProvider = None
 
 
 def get_provider():
@@ -18,8 +14,7 @@ def get_provider():
     if provider_name == "openai" and OpenAIProvider is not None:
         return OpenAIProvider()
 
-    if provider_name == "gemini" and GeminiProvider is not None:
-        return GeminiProvider()
+    if provider_name == "gemini":
+        return ProviderManager()
 
-    # default to mock provider
     return MockProvider()
