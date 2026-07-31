@@ -1,3 +1,7 @@
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel, Field, ValidationError
+from app.services.ai.base import AIServiceError
+from app.services.ai.provider_factory import get_provider
 def _generate_structured_response(
     *,
     task_type: str,
@@ -7,8 +11,16 @@ def _generate_structured_response(
     temperature: float = 0.0,
 ) -> BaseModel:
 
+    # --------------------------------------------------
+    # Check whether AI is enabled
+    # --------------------------------------------------
+
     if not settings.ai_enabled:
         _raise_ai_http_exception("AI_DISABLED")
+
+    # --------------------------------------------------
+    # Create provider
+    # --------------------------------------------------
 
     provider = get_provider()
 
@@ -19,9 +31,14 @@ def _generate_structured_response(
                 "task_type": task_type,
             },
         )
+
         _raise_ai_http_exception("CONFIGURATION_ERROR")
 
     provider_name = provider.__class__.__name__
+
+    # --------------------------------------------------
+    # Generate response
+    # --------------------------------------------------
 
     try:
         provider_resp = provider.generate_structured(
@@ -32,7 +49,7 @@ def _generate_structured_response(
             temperature=temperature,
         )
 
-    except Exception as exc:
+    except AIServiceError as exc:
         logger.warning(
             "AI mentor provider error",
             extra={
@@ -44,8 +61,30 @@ def _generate_structured_response(
 
         _raise_ai_http_exception(str(exc))
 
+    except Exception:
+        logger.exception(
+            "Unexpected AI mentor provider failure",
+            extra={
+                "task_type": task_type,
+                "provider": provider_name,
+            },
+        )
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="AI mentor request failed.",
+        )
+
+    # --------------------------------------------------
+    # Extract metadata
+    # --------------------------------------------------
+
     meta = provider_resp.get("meta", {})
     resolved_provider = meta.get("provider") or provider_name
+
+    # --------------------------------------------------
+    # Validate response
+    # --------------------------------------------------
 
     try:
         validated = response_model.model_validate(
@@ -63,6 +102,10 @@ def _generate_structured_response(
         )
 
         _raise_ai_http_exception("INVALID_RESPONSE")
+
+    # --------------------------------------------------
+    # Log success
+    # --------------------------------------------------
 
     logger.info(
         "AI mentor request completed",
