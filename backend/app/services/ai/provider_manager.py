@@ -7,76 +7,57 @@ from .openrouter_provider import OpenRouterProvider
 class ProviderManager:
 
     def __init__(self):
-        self.gemini = GeminiProvider()
-        self.groq = GroqProvider()
-        self.openrouter = OpenRouterProvider()
+
+        self.gemini = None
+        self.groq = None
+        self.openrouter = None
+
+        try:
+            self.gemini = GeminiProvider()
+            print("Gemini initialized successfully.")
+        except Exception as e:
+            print(f"Gemini initialization failed: {e}")
+
+        try:
+            self.groq = GroqProvider()
+            print("Groq initialized successfully.")
+        except Exception as e:
+            print(f"Groq initialization failed: {e}")
+
+        try:
+            self.openrouter = OpenRouterProvider()
+            print(f"OpenRouter initialization failed: {e}")
 
     def generate_structured(self, *args, **kwargs):
 
-        # ==================================================
-        # Try Gemini
-        # ==================================================
+        if self.gemini:
+            try:
+                print("Trying Gemini...")
+                return self.gemini.generate_structured(
+                    *args,
+                    **kwargs
+                )
+            except Exception as e:
+                print(f"Gemini failed: {e}")
 
-        try:
-            print("=" * 50)
-            print("Trying Gemini provider...")
-            print("=" * 50)
+        if self.groq:
+            try:
+                print("Trying Groq...")
+                return self.groq.generate_structured(
+                    *args,
+                    **kwargs
+                )
+            except Exception as e:
+                print(f"Groq failed: {e}")
 
-            result = self.gemini.generate_structured(
-                *args,
-                **kwargs
-            )
+        if self.openrouter:
+            try:
+                print("Trying OpenRouter...")
+                return self.openrouter.generate_structured(
+                    *args,
+                    **kwargs
+                )
+            except Exception as e:
+                print(f"OpenRouter failed: {e}")
 
-            print("Gemini succeeded.")
-            return result
-
-        except Exception as e:
-            print(f"Gemini failed: {e}")
-
-        # ==================================================
-        # Try Groq
-        # ==================================================
-
-        try:
-            print("=" * 50)
-            print("Trying Groq provider...")
-            print("=" * 50)
-
-            result = self.groq.generate_structured(
-                *args,
-                **kwargs
-            )
-
-            print("Groq succeeded.")
-            return result
-
-        except Exception as e:
-            print(f"Groq failed: {e}")
-
-        # ==================================================
-        # Try OpenRouter
-        # ==================================================
-
-        try:
-            print("=" * 50)
-            print("Trying OpenRouter provider...")
-            print("=" * 50)
-
-            result = self.openrouter.generate_structured(
-                *args,
-                **kwargs
-            )
-
-            print("OpenRouter succeeded.")
-            return result
-
-        except Exception as e:
-            print(f"OpenRouter failed: {e}")
-
-        # ==================================================
-        # All providers failed
-        # ==================================================
-
-        raise AIServiceError(
-            "All AI providers failed."
-        )
+        raise AIServiceError("All providers failed.")
