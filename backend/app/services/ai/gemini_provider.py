@@ -17,6 +17,12 @@ class GeminiProvider(LLMProvider):
         self.model = settings.gemini_model
         self.timeout = settings.ai_request_timeout_seconds
 
+        print("=" * 50)
+        print("Initializing Gemini provider")
+        print("Model:", self.model)
+        print("API key available:", bool(self.api_key))
+        print("=" * 50)
+
     def generate_structured(
         self,
         task_type: str,
@@ -60,7 +66,10 @@ class GeminiProvider(LLMProvider):
 
         try:
             with httpx.Client(timeout=self.timeout) as client:
-                response = client.post(url, json=payload)
+                response = client.post(
+                    url,
+                    json=payload,
+                )
 
             latency = int((time.time() - start) * 1000)
 
@@ -71,8 +80,18 @@ class GeminiProvider(LLMProvider):
             print("HTTP ERROR:", str(e))
             raise AIServiceError("PROVIDER_UNAVAILABLE")
 
+        print("=" * 50)
+        print("Status code:", response.status_code)
+        print("=" * 50)
+
         if response.status_code == 429:
             raise AIServiceError("RATE_LIMITED")
+
+        if response.status_code == 401:
+            raise AIServiceError("INVALID_API_KEY")
+
+        if response.status_code == 403:
+            raise AIServiceError("ACCESS_DENIED")
 
         if response.status_code >= 500:
             raise AIServiceError("PROVIDER_UNAVAILABLE")
@@ -81,8 +100,8 @@ class GeminiProvider(LLMProvider):
             body = response.json()
 
             print("=" * 50)
-            print("STATUS CODE:", response.status_code)
-            print("BODY:", body)
+            print("Response body:")
+            print(body)
             print("=" * 50)
 
         except Exception as e:
@@ -94,8 +113,7 @@ class GeminiProvider(LLMProvider):
             raise AIServiceError(str(body["error"]))
 
         if "candidates" not in body:
-            print("NO CANDIDATES FOUND")
-            print(body)
+            print("Candidates not found.")
             raise AIServiceError("INVALID_RESPONSE")
 
         try:
@@ -109,7 +127,9 @@ class GeminiProvider(LLMProvider):
             parsed = json.loads(text)
 
         except Exception:
-            parsed = {"message": text}
+            parsed = {
+                "message": text
+            }
 
         return {
             "result": parsed,
